@@ -42,7 +42,7 @@ namespace GameGuruChallenge
         {
             _stack.Completed += OnStackCompleted;
             _stack.Failed += OnStackFailed;
-            _stack.CubeCenterReached += OnStackCubeCenterReached;
+            _stack.PlayerMovePointReached += OnStackPlayerMovePointReached;
             InputController.Pressed += OnPressed;
         }
 
@@ -50,7 +50,7 @@ namespace GameGuruChallenge
         {
             _stack.Completed -= OnStackCompleted;
             _stack.Failed -= OnStackFailed;
-            _stack.CubeCenterReached -= OnStackCubeCenterReached;
+            _stack.PlayerMovePointReached -= OnStackPlayerMovePointReached;
             InputController.Pressed -= OnPressed;
         }
 
@@ -64,7 +64,7 @@ namespace GameGuruChallenge
             FinishLevel(true);
         }
         
-        private void OnStackCubeCenterReached(StackCube cube)
+        private void OnStackPlayerMovePointReached(StackCube cube)
         {
             if (_stack.NextCube)
                 _player.SetNextCube(_stack.NextCube);

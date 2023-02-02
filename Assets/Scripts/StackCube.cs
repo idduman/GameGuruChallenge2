@@ -23,7 +23,7 @@ namespace GameGuruChallenge
         public float CenterPosX => transform.position.x;
         public float StartPosZ => CenterPosZ - LengthZ/2f;
         public float EndPosZ => CenterPosZ + LengthZ/2f;
-        
+        public float PlayerMovePosZ => CenterPosZ;
     }
 
 }

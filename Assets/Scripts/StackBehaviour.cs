@@ -1,12 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Transactions;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace GameGuruChallenge
 {
@@ -14,24 +10,21 @@ namespace GameGuruChallenge
     {
         public event Action Completed;
         public event Action Failed;
-        public event Action<StackCube> CubeCenterReached;
+        public event Action<StackCube> PlayerMovePointReached;
+        public bool Active;
 
         [SerializeField] private float _fitTreshold = 0.4f;
         [SerializeField] private List<StackCube> _cubes = new();
-        
+
         private bool _completed;
-        public bool Active;
-
         private int _currentCubeIndex;
-        public int CurrentCubeIndex => _currentCubeIndex;
-
+        private float _currentWidth;
+        private Tween _cubeTween;
         private StackCube _currentCube;
         private StackCube _nextCube;
         public StackCube NextCube => _nextCube;
-
-        private Tween _cubeTween;
+        public int CurrentCubeIndex => _currentCubeIndex;
         private bool LastCube => _currentCubeIndex >= _cubes.Count - 1;
-
         public float Length => _cubes.Sum(c => c.LengthZ);
 
         public void Initialize()
@@ -46,6 +39,7 @@ namespace GameGuruChallenge
 
             _currentCubeIndex = 0;
             _currentCube = _cubes[0];
+            _currentWidth = _currentCube.Width;
             _currentCube.State = CubeState.Stopped;
             _nextCube = _cubes[1];
 
@@ -80,17 +74,23 @@ namespace GameGuruChallenge
 
                 _currentCube.State = CubeState.Completed;
                 _currentCube = _nextCube;
+                _currentWidth = Mathf.Min(_currentWidth, _currentCube.Width);
                 _currentCubeIndex++;
                 _nextCube = LastCube ? null : _cubes[_currentCubeIndex + 1];
             }
-            else if (playerPos.z >= _currentCube.CenterPosZ && _nextCube && _nextCube.State == CubeState.Stopped)
+            else if (playerPos.z >= _currentCube.PlayerMovePosZ && _nextCube && _nextCube.State == CubeState.Stopped)
             {
-                CubeCenterReached?.Invoke(_currentCube);
+                PlayerMovePointReached?.Invoke(_currentCube);
             }
             else if (playerPos.z >= _currentCube.StartPosZ && _nextCube && _nextCube.State == CubeState.Waiting)
             {
                 _nextCube.State = CubeState.Moving;
+                
                 _nextCube.transform.position -= 6f * Vector3.right;
+                var newScale = _nextCube.transform.localScale;
+                newScale.x = _currentWidth;
+                _nextCube.transform.localScale = newScale;
+                
                 _nextCube.gameObject.SetActive(true);
                 _cubeTween = _nextCube.transform.DOMoveX(_nextCube.CenterPosX + 12f, 1f)
                     .OnComplete(() => _nextCube.State = CubeState.Failed);
@@ -103,13 +103,16 @@ namespace GameGuruChallenge
             if (!_nextCube || _nextCube.State != CubeState.Moving)
                 return;
 
-            _cubeTween.Kill();
-            var offset = _nextCube.CenterPosX - _currentCube.CenterPosX;
             _nextCube.State = CubeState.Stopped;
             
+            _cubeTween.Kill();
+            var offset = _nextCube.CenterPosX - _currentCube.CenterPosX;
+
             if (Mathf.Abs(offset) < _fitTreshold)
             {
-                _nextCube.transform.DOMoveX(_currentCube.CenterPosX, Mathf.Abs(offset)*0.1f);
+                var nextPos = _nextCube.transform.position;
+                _nextCube.transform.position =
+                    new Vector3(_currentCube.CenterPosX, nextPos.y, nextPos.z);
                 return;
             }
             if (Mathf.Abs(offset) > _currentCube.Width)
@@ -122,9 +125,9 @@ namespace GameGuruChallenge
             _nextCube.transform.position -= offset / 2f * Vector3.right;
             _nextCube.transform.localScale -= Mathf.Abs(offset) * Vector3.right;
 
-            var fallCubePos = _nextCube.transform.position + (_nextCube.Width/2f * offset * Vector3.right);
             var fallCubeScale = new Vector3(offset, _nextCube.transform.localScale.y, _nextCube.transform.localScale.z);
-
+            var fallCubePos = _nextCube.transform.position
+                              + (Mathf.Sign(offset) * _nextCube.Width + offset)/2f * Vector3.right;
             var fallCube = Instantiate(_nextCube, fallCubePos, _nextCube.transform.rotation);
             fallCube.transform.localScale = fallCubeScale;
             fallCube.GetComponent<Rigidbody>().isKinematic = false;

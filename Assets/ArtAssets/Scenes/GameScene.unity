@@ -3634,8 +3634,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0b79915301437842936d961e3d61396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 2
-  _sideSpeed: 2
+  _moveSpeed: 1.8
+  _sideSpeed: 3
   _victoryCam: {fileID: 132123042}
 --- !u!1 &778004286
 GameObject:

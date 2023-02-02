@@ -18,6 +18,8 @@ namespace GameGuruChallenge
 
         private bool _moving;
         private static readonly int Victory1 = Animator.StringToHash("Victory");
+        private float perc;
+        private float _previousOffset;
 
         public bool Moving
         {
@@ -38,9 +40,15 @@ namespace GameGuruChallenge
         {
             if (Moving)
             {
-                var pos = transform.position;
+                var prevPos = transform.position;
+                var pos = prevPos;
+                prevPos.x = _previousOffset;
                 pos.x = _xOffset;
-                transform.position = Vector3.Lerp(transform.position, pos, _sideSpeed*Time.deltaTime);
+                if (perc < 1f)
+                {
+                    transform.position = Vector3.Lerp(prevPos, pos, perc);
+                    perc += _sideSpeed * Time.deltaTime;
+                }
                 
                 transform.position += _moveSpeed * Time.deltaTime * Vector3.forward;
             }
@@ -56,7 +64,9 @@ namespace GameGuruChallenge
 
         public void SetNextCube(StackCube nextCube)
         {
+            _previousOffset = transform.position.x;
             _xOffset = nextCube.CenterPosX;
+            perc = 0f;
         }
 
         public void Victory()
