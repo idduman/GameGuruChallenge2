@@ -69,7 +69,7 @@ namespace GameGuruChallenge
                     return;
                 }
 
-                if (!_nextCube)
+                if (!_nextCube || _nextCube.State is CubeState.Moving or CubeState.Failed)
                 {
                     Failed?.Invoke();
                     return;
@@ -83,7 +83,7 @@ namespace GameGuruChallenge
                 _currentCubeIndex++;
                 _nextCube = LastCube ? null : _cubes[_currentCubeIndex + 1];
             }
-            else if (playerPos.z >= _currentCube.CenterPosZ)
+            else if (playerPos.z >= _currentCube.CenterPosZ && _nextCube && _nextCube.State == CubeState.Stopped)
             {
                 CubeCenterReached?.Invoke(_currentCube);
             }
@@ -92,7 +92,8 @@ namespace GameGuruChallenge
                 _nextCube.State = CubeState.Moving;
                 _nextCube.transform.position -= 6f * Vector3.right;
                 _nextCube.gameObject.SetActive(true);
-                _cubeTween = _nextCube.transform.DOMoveX(_nextCube.CenterPosX + 12f, 1f);
+                _cubeTween = _nextCube.transform.DOMoveX(_nextCube.CenterPosX + 12f, 1f)
+                    .OnComplete(() => _nextCube.State = CubeState.Failed);
             }
 
         }
@@ -102,9 +103,10 @@ namespace GameGuruChallenge
             if (!_nextCube || _nextCube.State != CubeState.Moving)
                 return;
 
-            _nextCube.State = CubeState.Stopped;
             _cubeTween.Kill();
             var offset = _nextCube.CenterPosX - _currentCube.CenterPosX;
+            _nextCube.State = CubeState.Stopped;
+            
             if (Mathf.Abs(offset) < _fitTreshold)
             {
                 _nextCube.transform.DOMoveX(_currentCube.CenterPosX, Mathf.Abs(offset)*0.1f);
@@ -113,7 +115,7 @@ namespace GameGuruChallenge
             if (Mathf.Abs(offset) > _currentCube.Width)
             {
                 _nextCube.GetComponent<Rigidbody>().isKinematic = false;
-                _nextCube = null;
+                _nextCube.State = CubeState.Failed;
                 return;
             }
             

@@ -11,6 +11,7 @@ namespace GameGuruChallenge
         Moving,
         Stopped,
         Completed,
+        Failed,
     }
     public class StackCube : MonoBehaviour
     {

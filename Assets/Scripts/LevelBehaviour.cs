@@ -89,16 +89,19 @@ namespace GameGuruChallenge
                                      + previousLevel.Length * Vector3.forward;
             }
             
-            _player.transform.position = transform.position;
+            _player.Initialize();
             _stack.Initialize();
             Subscribe();
         }
 
         private void FinishLevel(bool success)
         {
+            if (_finished)
+                return;
+            
             _finished = true;
             InputController.Pressed -= OnPressed;
-            GameManager.Instance.FinishLevel(success);
+            StartCoroutine(FinishRoutine(success));
         }
         
         private void OnPressed(Vector3 pos)
@@ -112,6 +115,23 @@ namespace GameGuruChallenge
             }
             
             _stack.StopNextCube();
+        }
+
+        private IEnumerator FinishRoutine(bool success)
+        {
+            yield return new WaitForSeconds(0.25f);
+            _player.Moving = false; 
+            if (success)
+            {
+                _player.Victory();
+                yield return new WaitForSeconds(2f);
+            }
+            else
+            {
+                _player.Fall();
+                yield return new WaitForSeconds(1f);
+            }
+            GameManager.Instance.FinishLevel(success);
         }
     }
 }
