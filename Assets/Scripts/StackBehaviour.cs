@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 namespace GameGuruChallenge
 {
@@ -13,6 +14,7 @@ namespace GameGuruChallenge
         public event Action<StackCube> PlayerMovePointReached;
         public bool Active;
 
+        [SerializeField] private float _cubeSlideOffset = 6f;
         [SerializeField] private float _fitTreshold = 0.4f;
         [SerializeField] private List<StackCube> _cubes = new();
 
@@ -84,15 +86,18 @@ namespace GameGuruChallenge
             }
             else if (playerPos.z >= _currentCube.StartPosZ && _nextCube && _nextCube.State == CubeState.Waiting)
             {
+                var currentSlideOffset = (_currentCubeIndex % 2 == 0 ? 1 : -1) * _cubeSlideOffset;
                 _nextCube.State = CubeState.Moving;
-                
-                _nextCube.transform.position -= 6f * Vector3.right;
+                var nextPos = _nextCube.transform.position;
+                nextPos.x = _currentCube.CenterPosX - currentSlideOffset;
+                _nextCube.transform.position = nextPos;
+                    
                 var newScale = _nextCube.transform.localScale;
                 newScale.x = _currentWidth;
                 _nextCube.transform.localScale = newScale;
                 
                 _nextCube.gameObject.SetActive(true);
-                _cubeTween = _nextCube.transform.DOMoveX(_nextCube.CenterPosX + 12f, 1f)
+                _cubeTween = _nextCube.transform.DOMoveX(_nextCube.CenterPosX + 2f * currentSlideOffset, 1f)
                     .OnComplete(() => _nextCube.State = CubeState.Failed);
             }
 
