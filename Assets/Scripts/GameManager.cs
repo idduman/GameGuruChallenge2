@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 
@@ -26,12 +27,12 @@ namespace GameGuruChallenge
                 Debug.LogError("No levels are present in GameManager");
                 return;
             }
+            UIController.Instance.Initialize();
             StartCoroutine(LoadRoutine());
         }
 
         private IEnumerator LoadRoutine()
         {
-
             if (_currentLevel)
                 _previousLevel = _currentLevel;
             
@@ -42,6 +43,7 @@ namespace GameGuruChallenge
         
         public void FinishLevel(bool success)
         {
+            UIController.Instance.ActivateEndgamePanel(success);
         }
 
         public void EndLevel(bool success)
@@ -53,8 +55,14 @@ namespace GameGuruChallenge
                     Destroy(_previousLevel.gameObject);
                     _previousLevel = null;
                 }
+                ++_playerLevel;
             }
-            ++_playerLevel;
+            else
+            {
+                Destroy(_currentLevel.gameObject);
+                _currentLevel = null;
+            }
+            
             Load();
         }
     }
