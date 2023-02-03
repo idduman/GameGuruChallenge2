@@ -81,6 +81,8 @@ namespace GameGuruChallenge
 
         public void Load(LevelBehaviour previousLevel)
         {
+            _started = false;
+            _finished = false;
             if (!_player)
             {
                 Debug.LogError($"There is no player currently in the scene");
@@ -126,9 +128,9 @@ namespace GameGuruChallenge
                 _started = true;
                 _stack.Active = true;
                 _player.Moving = true;
+                UIController.Instance.ToggleStartPanel(false);
                 return;
             }
-            
             _stack.StopNextCube();
         }
 

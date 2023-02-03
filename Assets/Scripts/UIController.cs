@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class UIController : SingletonBehaviour<UIController>
 {
+    [SerializeField] private RectTransform _startPanel;
     [SerializeField] private RectTransform _successPanel;
     [SerializeField] private RectTransform _failPanel;
 
@@ -19,6 +20,7 @@ public class UIController : SingletonBehaviour<UIController>
     {
         _successPanel.gameObject.SetActive(false);
         _failPanel.gameObject.SetActive(false);
+        _startPanel.gameObject.SetActive(true);
     }
 
     public void RestartLevel()
@@ -29,5 +31,10 @@ public class UIController : SingletonBehaviour<UIController>
     public void NextLevel()
     {
         GameManager.Instance.EndLevel(true);
+    }
+
+    public void ToggleStartPanel(bool active)
+    {
+        _startPanel.gameObject.SetActive(active);
     }
 }

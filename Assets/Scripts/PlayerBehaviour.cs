@@ -29,6 +29,8 @@ namespace GameGuruChallenge
             set
             {
                 _moving = value;
+                if (_moving)
+                    _animator.speed = 1f;
             }
         }
 
@@ -64,6 +66,7 @@ namespace GameGuruChallenge
             _rb.transform.localPosition = Vector3.zero;
             _rb.transform.rotation = Quaternion.identity;
             _animator.Play("Run");
+            _animator.speed = 0f;
         }
 
         public void SetNextCube(StackCube nextCube)
