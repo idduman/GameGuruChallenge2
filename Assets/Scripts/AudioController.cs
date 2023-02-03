@@ -8,7 +8,7 @@ namespace GameGuruChallenge
     [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour
     {
-        [SerializeField] private List<float> _frequencies;
+        [SerializeField] private List<AudioClip> _notes;
         [SerializeField] private int _maxOctaves = 2;
         [SerializeField] private float _sustain = 0.5f;
         
@@ -27,7 +27,9 @@ namespace GameGuruChallenge
             if (!_audioSource)
                 return;
             
-            _audioSource.Stop();
+            if(_audioSource.isPlaying)
+                _audioSource.Stop();
+            
             if (!increment)
             {
                 _currentFreqIndex = 0;
@@ -35,7 +37,7 @@ namespace GameGuruChallenge
             }
             else
             {
-                if (_currentFreqIndex >= _frequencies.Count)
+                if (_currentFreqIndex >= _notes.Count - 1)
                 {
                     _currentFreqIndex = 0;
                     _octaves = (_octaves + 1) % _maxOctaves;
@@ -46,11 +48,14 @@ namespace GameGuruChallenge
                 }
             }
 
-            _audioSource.pitch = _frequencies[_currentFreqIndex] * (1 << _octaves); // 2^octaves
+            _audioSource.clip = _notes[_currentFreqIndex];
+            _audioSource.pitch = Mathf.Pow(2, _octaves); // 2^octaves
             
             if(_playRoutine != null && _audioSource.isPlaying)
                 StopCoroutine(_playRoutine);
-            _playRoutine = StartCoroutine(PlayRoutine());
+            
+
+            _audioSource.Play();
         }
 
         private IEnumerator PlayRoutine()

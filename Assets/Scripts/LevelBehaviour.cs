@@ -12,15 +12,17 @@ namespace GameGuruChallenge
     {
         [SerializeField] private StackBehaviour _stack;
         [SerializeField] private GameObject _finishLine;
-        
+
         private bool _started;
         private bool _finished;
         private PlayerBehaviour _player;
+        private AudioController _audioController;
         public float Length => _stack.Length;
         private void Awake()
         {
             _started = false;
             _player = FindObjectOfType<PlayerBehaviour>();
+            _audioController = FindObjectOfType<AudioController>();
         }
 
         private void OnDestroy()
@@ -42,6 +44,7 @@ namespace GameGuruChallenge
         {
             _stack.Completed += OnStackCompleted;
             _stack.Failed += OnStackFailed;
+            _stack.CubeStopped += OnCubeStopped;
             _stack.PlayerMovePointReached += OnStackPlayerMovePointReached;
             InputController.Pressed += OnPressed;
         }
@@ -50,8 +53,14 @@ namespace GameGuruChallenge
         {
             _stack.Completed -= OnStackCompleted;
             _stack.Failed -= OnStackFailed;
+            _stack.CubeStopped -= OnCubeStopped;
             _stack.PlayerMovePointReached -= OnStackPlayerMovePointReached;
             InputController.Pressed -= OnPressed;
+        }
+
+        private void OnCubeStopped(int comboCount)
+        {
+            _audioController.PlayNote(comboCount > 0);
         }
 
         private void OnStackFailed()

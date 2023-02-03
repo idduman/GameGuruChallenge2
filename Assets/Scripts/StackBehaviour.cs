@@ -11,6 +11,7 @@ namespace GameGuruChallenge
     {
         public event Action Completed;
         public event Action Failed;
+        public event Action<int> CubeStopped;
         public event Action<StackCube> PlayerMovePointReached;
         public bool Active;
         
@@ -106,7 +107,7 @@ namespace GameGuruChallenge
 
         private void PlayNote()
         {
-            
+            CubeStopped?.Invoke(_comboCount);
         }
 
         public void StopNextCube()
@@ -127,19 +128,19 @@ namespace GameGuruChallenge
                 
                 if(_currentCubeIndex != 0)
                     _comboCount++;
-                PlayNote();
+                CubeStopped?.Invoke(_comboCount);
                 return;
             }
             _comboCount = 0;
             
-            if (Mathf.Abs(offset) > (_currentCube.Width - _fitTreshold))
+            if (Mathf.Abs(offset) > (_currentCube.Width - _fitTreshold /2f))
             {
                 _nextCube.GetComponent<Rigidbody>().isKinematic = false;
                 _nextCube.State = CubeState.Failed;
                 return;
             }
             
-            PlayNote();
+            CubeStopped?.Invoke(_comboCount);
             
             _nextCube.transform.position -= offset / 2f * Vector3.right;
             _nextCube.transform.localScale -= Mathf.Abs(offset) * Vector3.right;
