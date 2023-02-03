@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 
 namespace GameGuruChallenge
@@ -73,12 +75,26 @@ namespace GameGuruChallenge
 
         public void Victory()
         {
-            _victoryCam.enabled = true;
-            _animator.SetTrigger(Victory1);
+            StartCoroutine(VictoryRoutine());
         }
         public void Fall()
         {
             _rb.isKinematic = false;
+        }
+
+        private IEnumerator VictoryRoutine()
+        {
+            _victoryCam.enabled = true;
+            yield return new WaitForSeconds(0.1f);
+            _animator.SetTrigger(Victory1);
+            yield return new WaitForSeconds(0.4f);
+            var transposer = _victoryCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
+            if (transposer)
+            {
+                DOTween.To(() => transposer.m_Heading.m_Bias,
+                    x => transposer.m_Heading.m_Bias = x, 360f, 2f)
+                    .OnComplete(() => transposer.m_Heading.m_Bias = 0f);
+            }
         }
     }
 }

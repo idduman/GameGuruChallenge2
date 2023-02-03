@@ -124,7 +124,7 @@ namespace GameGuruChallenge
             if (success)
             {
                 _player.Victory();
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(3f);
             }
             else
             {

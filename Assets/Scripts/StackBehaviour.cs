@@ -20,6 +20,7 @@ namespace GameGuruChallenge
 
         private bool _completed;
         private int _currentCubeIndex;
+        private int _comboCount;
         private float _currentWidth;
         private Tween _cubeTween;
         private StackCube _currentCube;
@@ -103,6 +104,11 @@ namespace GameGuruChallenge
 
         }
 
+        private void PlayNote()
+        {
+            
+        }
+
         public void StopNextCube()
         {
             if (!_nextCube || _nextCube.State != CubeState.Moving)
@@ -118,14 +124,22 @@ namespace GameGuruChallenge
                 var nextPos = _nextCube.transform.position;
                 _nextCube.transform.position =
                     new Vector3(_currentCube.CenterPosX, nextPos.y, nextPos.z);
+                
+                if(_currentCubeIndex != 0)
+                    _comboCount++;
+                PlayNote();
                 return;
             }
+            _comboCount = 0;
+            
             if (Mathf.Abs(offset) > _currentCube.Width)
             {
                 _nextCube.GetComponent<Rigidbody>().isKinematic = false;
                 _nextCube.State = CubeState.Failed;
                 return;
             }
+            
+            PlayNote();
             
             _nextCube.transform.position -= offset / 2f * Vector3.right;
             _nextCube.transform.localScale -= Mathf.Abs(offset) * Vector3.right;
