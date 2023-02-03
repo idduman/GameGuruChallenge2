@@ -56,12 +56,12 @@ namespace GameGuruChallenge
             }
         }
 
-        public void Initialize()
+        public void Initialize(Vector3 position)
         {
             _victoryCam.enabled = false;
             _rb.isKinematic = true;
-            transform.position = Vector3.zero;
-            _rb.transform.position = Vector3.zero;
+            transform.position = position + Vector3.forward;
+            _rb.transform.localPosition = Vector3.zero;
             _rb.transform.rotation = Quaternion.identity;
             _animator.Play("Run");
         }

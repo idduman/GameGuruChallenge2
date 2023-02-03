@@ -11,11 +11,11 @@ namespace GameGuruChallenge
     public class LevelBehaviour : MonoBehaviour
     {
         [SerializeField] private StackBehaviour _stack;
-
+        [SerializeField] private GameObject _finishLine;
+        
         private bool _started;
         private bool _finished;
         private PlayerBehaviour _player;
-
         public float Length => _stack.Length;
         private void Awake()
         {
@@ -89,10 +89,16 @@ namespace GameGuruChallenge
                                      + previousLevel.Length * Vector3.forward;
             }
             
-            _player.Initialize();
+            _player.Initialize(transform.position);
             _stack.Initialize();
             Subscribe();
         }
+
+        public void PostFinish()
+        {
+            _finishLine.gameObject.SetActive(false);
+        }
+
 
         private void FinishLevel(bool success)
         {

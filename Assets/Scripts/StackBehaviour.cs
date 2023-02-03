@@ -13,7 +13,7 @@ namespace GameGuruChallenge
         public event Action Failed;
         public event Action<StackCube> PlayerMovePointReached;
         public bool Active;
-
+        
         [SerializeField] private float _cubeSlideOffset = 6f;
         [SerializeField] private float _fitTreshold = 0.4f;
         [SerializeField] private List<StackCube> _cubes = new();
@@ -28,7 +28,7 @@ namespace GameGuruChallenge
         public StackCube NextCube => _nextCube;
         public int CurrentCubeIndex => _currentCubeIndex;
         private bool LastCube => _currentCubeIndex >= _cubes.Count - 1;
-        public float Length => _cubes.Sum(c => c.LengthZ);
+        public float Length => _cubes.Last().transform.localPosition.z + _cubes.Last().LengthZ / 2f;
 
         public void Initialize()
         {
@@ -132,7 +132,7 @@ namespace GameGuruChallenge
             }
             _comboCount = 0;
             
-            if (Mathf.Abs(offset) > _currentCube.Width)
+            if (Mathf.Abs(offset) > (_currentCube.Width - _fitTreshold))
             {
                 _nextCube.GetComponent<Rigidbody>().isKinematic = false;
                 _nextCube.State = CubeState.Failed;

@@ -34,8 +34,11 @@ namespace GameGuruChallenge
         private IEnumerator LoadRoutine()
         {
             if (_currentLevel)
+            {
                 _previousLevel = _currentLevel;
-            
+                _previousLevel.PostFinish();
+            }
+
             _currentLevel = Instantiate(_levels[_playerLevel % _levels.Count]);
             _currentLevel.Load(_previousLevel);
             yield return new WaitForEndOfFrame();
