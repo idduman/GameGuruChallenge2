@@ -4314,9 +4314,10 @@ GameObject:
   m_Component:
   - component: {fileID: 691919732}
   - component: {fileID: 691919733}
+  - component: {fileID: 691919734}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4355,6 +4356,20 @@ MonoBehaviour:
   _moveSpeed: 1.8
   _sideSpeed: 3.6
   _victoryCam: {fileID: 132123042}
+--- !u!136 &691919734
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691919731}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1.3142198
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.57941216, z: 0}
 --- !u!1 &742049302
 GameObject:
   m_ObjectHideFlags: 0

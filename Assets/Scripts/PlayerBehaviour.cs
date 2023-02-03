@@ -13,9 +13,10 @@ namespace GameGuruChallenge
         [SerializeField] private float _moveSpeed = 1f;
         [SerializeField] private float _sideSpeed = 1f;
         [SerializeField] private CinemachineVirtualCamera _victoryCam;
+        [SerializeField] private Rigidbody _modelRb;
         
         private float _xOffset = 0f;
-        private Rigidbody _rb;
+
         private Animator _animator;
 
         private bool _moving;
@@ -36,11 +37,11 @@ namespace GameGuruChallenge
 
         private void Awake()
         {
-            _rb = GetComponentInChildren<Rigidbody>();
+            _modelRb = GetComponentInChildren<Rigidbody>();
             _animator = GetComponentInChildren<Animator>();
         }
 
-        void Update()
+        private void Update()
         {
             if (Moving)
             {
@@ -58,13 +59,21 @@ namespace GameGuruChallenge
             }
         }
 
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Collectible") && other.TryGetComponent<ICollectible>(out var collectible))
+            {
+                collectible.Collect();
+            }
+        }
+
         public void Initialize(Vector3 position)
         {
             _victoryCam.enabled = false;
-            _rb.isKinematic = true;
+            _modelRb.isKinematic = true;
             transform.position = position + Vector3.forward;
-            _rb.transform.localPosition = Vector3.zero;
-            _rb.transform.rotation = Quaternion.identity;
+            _modelRb.transform.localPosition = Vector3.zero;
+            _modelRb.transform.rotation = Quaternion.identity;
             _animator.Play("Run");
             _animator.speed = 0f;
         }
@@ -82,7 +91,7 @@ namespace GameGuruChallenge
         }
         public void Fall()
         {
-            _rb.isKinematic = false;
+            _modelRb.isKinematic = false;
         }
 
         private IEnumerator VictoryRoutine()
